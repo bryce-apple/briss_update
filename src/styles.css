@@ -100,6 +100,46 @@ h1 .sub {
   margin: 0 auto;
 }
 
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 0.3rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.25rem;
+}
+.tab {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  padding: 0.45rem 0.95rem;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.tab:hover {
+  color: var(--text);
+}
+.tab.active {
+  background: var(--panel-2);
+  color: var(--accent);
+  box-shadow: 0 0 0 1px var(--border) inset;
+}
+
+/* A mode (tool) and its toolbar */
+.mode[hidden] {
+  display: none;
+}
+.toolbar {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  margin-bottom: 1.1rem;
+}
+
 .dropzone {
   border: 2px dashed var(--border);
   border-radius: 14px;
@@ -193,4 +233,83 @@ h1 .sub {
 .tool-hint {
   color: var(--muted);
   font-size: 0.76rem;
+}
+
+/* Organize mode — thumbnail grid */
+.thumb-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.9rem;
+}
+.thumb-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.5rem;
+  cursor: grab;
+  transition:
+    transform 0.08s ease,
+    box-shadow 0.08s ease,
+    opacity 0.12s ease;
+}
+.thumb-card:hover {
+  border-color: var(--accent);
+}
+.thumb-card.dragging {
+  opacity: 0.4;
+  cursor: grabbing;
+}
+.thumb-card.drop-target {
+  box-shadow: -3px 0 0 var(--accent-2);
+  border-color: var(--accent-2);
+}
+.thumb-card.deleted {
+  opacity: 0.45;
+}
+.thumb-card.deleted .thumb-frame::after {
+  content: "Deleted";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(190, 30, 45, 0.35);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+}
+.thumb-frame {
+  position: relative;
+  background: #fff;
+  border-radius: 5px;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  min-height: 90px;
+}
+.thumb-frame canvas {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+.thumb-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.45rem;
+}
+.thumb-num {
+  flex: 1;
+  color: var(--muted);
+  font-size: 0.74rem;
+  white-space: nowrap;
+}
+.btn.icon {
+  padding: 0.2rem 0.4rem;
+  font-size: 0.85rem;
+  line-height: 1;
+}
+.btn.icon.danger:hover {
+  border-color: #ef4444;
+  color: #fca5a5;
 }
