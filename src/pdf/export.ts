@@ -86,28 +86,39 @@ export async function exportCroppedPdf(
   const pageCluster = buildPageClusterMap(clusters);
   const total = src.getPageCount();
 
+  // Build the output plan first: one entry per output page, in order. A page
+  // with no rects passes through (rect = null); a page with N rects yields N
+  // entries (the split).
+  const plan: { srcIndex: number; rect: NormRect | null }[] = [];
   for (let i = 0; i < total; i++) {
-    const cluster = pageCluster.get(i);
-    const rects = cluster?.rects ?? [];
-
+    const rects = pageCluster.get(i)?.rects ?? [];
     if (rects.length === 0) {
-      // No crop drawn for this page's group — pass it through unchanged.
-      const [copy] = await out.copyPages(src, [i]);
-      out.addPage(copy);
-      continue;
-    }
-
-    for (const rect of rects) {
-      // A fresh copy per rectangle so each can carry its own crop box.
-      const [copy] = await out.copyPages(src, [i]);
-      const cb = copy.getCropBox();
-      const rotation = copy.getRotation().angle;
-      const user = toUserRect(cb, rotation, rect);
-      copy.setCropBox(user.x, user.y, user.width, user.height);
-      copy.setMediaBox(user.x, user.y, user.width, user.height);
-      out.addPage(copy);
+      plan.push({ srcIndex: i, rect: null });
+    } else {
+      for (const rect of rects) plan.push({ srcIndex: i, rect });
     }
   }
+
+  // Copy every needed page in a SINGLE call. pdf-lib de-duplicates shared
+  // indirect objects (fonts, scanned images) across the whole copy — including
+  // split duplicates — so the output stays close to the source size instead of
+  // duplicating image data per page. Duplicated indices come back as distinct
+  // page objects, so each can carry its own crop box.
+  const copied = await out.copyPages(
+    src,
+    plan.map((p) => p.srcIndex),
+  );
+
+  copied.forEach((page, k) => {
+    const rect = plan[k].rect;
+    if (rect) {
+      const cb = page.getCropBox();
+      const user = toUserRect(cb, page.getRotation().angle, rect);
+      page.setCropBox(user.x, user.y, user.width, user.height);
+      page.setMediaBox(user.x, user.y, user.width, user.height);
+    }
+    out.addPage(page);
+  });
 
   return out.save();
 }
