@@ -17,6 +17,11 @@ permissions:
   pages: write
   id-token: write
 
+# Run the JS-based actions on Node 24 ahead of GitHub forcing it (June 2026),
+# which silences the Node 20 deprecation warnings and future-proofs the workflow.
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 # Allow one concurrent deployment; cancel older in-progress runs.
 concurrency:
   group: pages
@@ -29,7 +34,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
       - run: npm ci
       - run: npm run build
