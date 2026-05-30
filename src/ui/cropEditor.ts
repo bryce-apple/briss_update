@@ -53,6 +53,19 @@ export class CropEditor {
     this.draw();
   }
 
+  /** Replace this cluster's rectangles with clones of the given ones. */
+  setRects(rects: NormRect[]): void {
+    this.cluster.rects = rects.map((r) => ({ ...r, id: newId() }));
+    this.selected = null;
+    this.draw();
+    this.onChange();
+  }
+
+  /** Snapshot the current rectangles (used for copy/paste between clusters). */
+  getRects(): NormRect[] {
+    return this.cluster.rects.map((r) => ({ ...r }));
+  }
+
   /** Remove the currently selected rectangle, if any. */
   deleteSelected(): void {
     if (!this.selected) return;

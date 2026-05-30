@@ -27,7 +27,7 @@ interface UserRect {
  * user-space rectangle (bottom-left origin) within the page's visible box,
  * accounting for page rotation.
  */
-function toUserRect(
+export function toUserRect(
   cb: { x: number; y: number; width: number; height: number },
   rotation: number,
   r: NormRect,

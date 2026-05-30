@@ -25,16 +25,36 @@ npm install
 npm run dev      # start the dev server
 npm run build    # type-check + production build into dist/
 npm run preview  # preview the production build
+npm test         # run the headless test suite
 ```
+
+## Tests
+
+`npm test` runs a headless [Vitest](https://vitest.dev/) suite covering the
+browser-independent core:
+
+- **Clustering** — identical pages split into odd/even groups; differing sizes
+  separate.
+- **Page splitting** — two rectangles on one source page produce two correctly
+  cropped output pages, in order; empty clusters pass through unchanged.
+- **Rotation math** — the normalized-rect → PDF-user-space mapping is checked at
+  **0°, 90°, 180° and 270°** against pdf.js's own `viewport.convertToPdfPoint`
+  as an independent oracle.
+
+The visual preview rendering and pointer interactions require a real browser, so
+they are covered by the production build + manual use rather than the headless
+suite.
 
 ## Status
 
 First working version. Implemented: clustering, ghost previews, multi-rectangle
-crop editing, page splitting, non-destructive export.
+crop editing, page splitting (book scans), copy/paste of rectangles between
+groups, rotation-correct non-destructive export (verified for all four page
+rotations).
 
-Not yet implemented (candidates for next): auto-crop margin detection,
-copy/paste rectangles between groups, and tuned handling of 90°/270° rotated
-scans (the 0°/180° paths are exercised; rotated paths are best-effort).
+Not yet implemented (candidates for next): auto-crop margin detection, and
+end-to-end verification driving the assembled UI in a headless browser (blocked
+in the current sandbox by the browser-download network policy).
 
 ## Source layout
 

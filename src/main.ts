@@ -10,7 +10,7 @@ import { readPageInfos, clusterPages } from "./pdf/cluster";
 import { renderClusterPreview } from "./pdf/preview";
 import { exportCroppedPdf } from "./pdf/export";
 import { CropEditor } from "./ui/cropEditor";
-import type { Cluster } from "./types";
+import type { Cluster, NormRect } from "./types";
 
 const fileInput = document.getElementById("file-input") as HTMLInputElement;
 const dropzone = document.getElementById("dropzone") as HTMLElement;
@@ -22,6 +22,8 @@ let sourceBytes: ArrayBuffer | null = null;
 let clusters: Cluster[] = [];
 let sourceName = "document.pdf";
 const editors: CropEditor[] = [];
+/** Cross-cluster clipboard for copy/paste of crop rectangles. */
+let rectClipboard: NormRect[] | null = null;
 
 function setStatus(msg: string, busy = false): void {
   statusEl.hidden = false;
@@ -86,14 +88,40 @@ function buildClusterPanel(cluster: Cluster, preview: HTMLCanvasElement): HTMLEl
 
   const tools = document.createElement("div");
   tools.className = "cluster-tools";
+
   const del = document.createElement("button");
   del.className = "btn small";
-  del.textContent = "Delete selected rect";
+  del.textContent = "Delete selected";
   del.addEventListener("click", () => editor.deleteSelected());
+
+  const copy = document.createElement("button");
+  copy.className = "btn small";
+  copy.textContent = "Copy rects";
+  copy.addEventListener("click", () => {
+    rectClipboard = editor.getRects();
+    setStatus(
+      rectClipboard.length
+        ? `Copied ${rectClipboard.length} rectangle${rectClipboard.length === 1 ? "" : "s"}. Paste onto another group.`
+        : "This group has no rectangles to copy yet.",
+    );
+  });
+
+  const paste = document.createElement("button");
+  paste.className = "btn small";
+  paste.textContent = "Paste rects";
+  paste.addEventListener("click", () => {
+    if (!rectClipboard || rectClipboard.length === 0) {
+      setStatus("Nothing copied yet — use Copy rects on a group first.");
+      return;
+    }
+    editor.setRects(rectClipboard);
+    setStatus(`Pasted ${rectClipboard.length} rectangle${rectClipboard.length === 1 ? "" : "s"}.`);
+  });
+
   const hint = document.createElement("span");
   hint.className = "tool-hint";
   hint.textContent = "Drag to draw · drag inside to move · corners to resize · two rects = split";
-  tools.append(del, hint);
+  tools.append(del, copy, paste, hint);
 
   panel.append(head, editor.element, tools);
   return panel;
