@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Briss Web — crop many PDF pages at once</title>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <span class="logo">✂️</span>
+        <div>
+          <h1>Briss <span class="sub">Web</span></h1>
+          <p class="tagline">Crop many PDF pages at once. Everything stays in your browser.</p>
+        </div>
+      </div>
+      <div class="actions">
+        <label class="btn" for="file-input">Open PDF…</label>
+        <input id="file-input" type="file" accept="application/pdf,.pdf" hidden />
+        <button id="export-btn" class="btn primary" disabled>Crop &amp; Download</button>
+      </div>
+    </header>
+
+    <main id="main">
+      <div id="dropzone" class="dropzone">
+        <p>Drop a PDF here, or <label for="file-input" class="link">choose a file</label>.</p>
+        <p class="hint">
+          Pages of the same size are stacked into one ghost preview. Draw one or more crop
+          rectangles per group — two rectangles split each page in two (great for book scans).
+        </p>
+      </div>
+
+      <div id="status" class="status" hidden></div>
+      <section id="clusters" class="clusters"></section>
+    </main>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
